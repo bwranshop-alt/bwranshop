@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BwranShop - Dijital Ürünler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #05080a, #0a1118, #081018, #05080a);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: #e0f7fa;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* CİHAZ SEÇİM */
+        .device-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(-45deg, #05080a, #0a1118, #081018, #05080a);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .device-modal.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        .device-modal-content {
+            background: rgba(15, 20, 24, 0.9); backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 20px;
+            padding: 40px; max-width: 500px; width: 100%; text-align: center;
+            box-shadow: 0 0 60px rgba(0, 229, 255, 0.3);
+            animation: modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes modalPop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .device-modal-content img {
+            width: 80px; height: 80px; object-fit: contain; margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.6));
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.6)); }
+            50% { filter: drop-shadow(0 0 35px rgba(0, 229, 255, 1)); }
+        }
+
+        .device-modal-content h1 {
+            font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 3px;
+            color: #fff; margin-bottom: 8px; text-shadow: 0 0 30px rgba(0, 229, 255, 0.6);
+        }
+
+        .device-modal-content h1 span { color: #00e5ff; }
+        .device-modal-content p { color: #80deea; font-size: 14px; margin-bottom: 32px; letter-spacing: 1px; }
+        .device-options { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+        .device-btn {
+            flex: 1; min-width: 140px; background: rgba(0, 229, 255, 0.08);
+            border: 2px solid rgba(0, 229, 255, 0.3); border-radius: 16px;
+            padding: 24px 16px; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            color: #e0f7fa; font-family: 'Inter', sans-serif;
+        }
+
+        .device-btn:hover {
+            background: rgba(0, 229, 255, 0.15); border-color: #00e5ff;
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.4);
+        }
+
+        .device-btn i {
+            font-size: 42px; color: #00e5ff;
+            filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.6));
+        }
+
+        .device-btn span { font-size: 16px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+        .device-btn small { font-size: 11px; color: #4a6a7a; }
+
+        /* MOBİL MOD */
+        body.mobile-mode .games-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+        body.mobile-mode .game-card .card-info h3 { font-size: 11px; min-height: 28px; }
+        body.mobile-mode .game-card .card-actions .btn-buy { font-size: 10px; padding: 7px 8px; }
+        body.mobile-mode .container { flex-direction: column !important; padding: 12px !important; gap: 12px !important; }
+        body.mobile-mode .detail-panel { width: 100% !important; position: static !important; max-height: none !important; }
+        body.mobile-mode .top-bar { padding: 10px 14px; flex-wrap: wrap; }
+        body.mobile-mode .search-bar { order: 3; max-width: 100%; flex-basis: 100%; }
+        body.mobile-mode .logo img { height: 38px; width: 38px; }
+        body.mobile-mode .logo-text { font-size: 20px; }
+        body.mobile-mode .page-header h2 { font-size: 20px; }
+
+        /* ÜST BAR */
+        .top-bar {
+            background: rgba(5, 8, 10, 0.85); backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+            padding: 12px 24px; display: flex; align-items: center;
+            justify-content: space-between; gap: 16px;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 30px rgba(0, 229, 255, 0.05);
+        }
+
+        .logo { display: flex; align-items: center; gap: 12px; flex-shrink: 0; text-decoration: none; }
+        .logo img {
+            height: 48px; width: 48px; object-fit: contain;
+            filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.5));
+        }
+
+        .logo-text {
+            font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+            letter-spacing: 2px; color: #ffffff; line-height: 1;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+        }
+
+        .logo-text span { color: #00e5ff; }
+        .search-bar { flex: 1; max-width: 600px; position: relative; margin: 0 auto; }
+
+        .search-bar input {
+            width: 100%; padding: 11px 16px 11px 42px;
+            background: rgba(15, 20, 24, 0.8); border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px; color: #fff; font-size: 14px; outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: #00e5ff;
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15), 0 0 25px rgba(0, 229, 255, 0.3);
+        }
+
+        .search-bar input::placeholder { color: #4a6a7a; }
+        .search-bar svg {
+            position: absolute; left: 13px; top: 50%;
+            transform: translateY(-50%); width: 18px; height: 18px;
+            color: #00e5ff; pointer-events: none; opacity: 0.7;
+        }
+
+        /* KATEGORİ MENÜSÜ */
+        .category-menu {
+            background: transparent; border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+            padding: 10px 24px; display: flex; gap: 8px; flex-wrap: wrap;
+        }
+
+        .category-menu button {
+            background: rgba(15, 20, 24, 0.7); border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 20px; padding: 8px 16px; color: #80deea;
+            font-size: 12px; font-weight: 800; cursor: pointer;
+            display: flex; align-items: center; gap: 6px;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            transition: all 0.3s ease; font-family: 'Inter', sans-serif;
+        }
+
+        .category-menu button:hover {
+            border-color: #00e5ff; color: #fff;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .category-menu button.active {
+            background: linear-gradient(135deg, #00e5ff, #00b8d4);
+            border-color: #00e5ff; color: #05080a;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+        }
+
+        .category-menu button[data-category="discord"].active { background: linear-gradient(135deg, #5865F2, #4752C4); border-color: #5865F2; color: #fff; box-shadow: 0 0 25px rgba(88, 101, 242, 0.6); }
+        .category-menu button[data-category="telegram"].active { background: linear-gradient(135deg, #0088cc, #006699); border-color: #0088cc; color: #fff; box-shadow: 0 0 25px rgba(0, 136, 204, 0.6); }
+        .category-menu button[data-category="instagram"].active { background: linear-gradient(135deg, #E1306C, #C13584); border-color: #E1306C; color: #fff; box-shadow: 0 0 25px rgba(225, 48, 108, 0.6); }
+        .category-menu button[data-category="spotify"].active { background: linear-gradient(135deg, #1DB954, #1AA34A); border-color: #1DB954; color: #fff; box-shadow: 0 0 25px rgba(29, 185, 84, 0.6); }
+        .category-menu button[data-category="twitter"].active { background: linear-gradient(135deg, #1DA1F2, #0d8bd9); border-color: #1DA1F2; color: #fff; box-shadow: 0 0 25px rgba(29, 161, 242, 0.6); }
+        .category-menu button[data-category="facebook"].active { background: linear-gradient(135deg, #1877F2, #0d5fcc); border-color: #1877F2; color: #fff; box-shadow: 0 0 25px rgba(24, 119, 242, 0.6); }
+        .category-menu button[data-category="windows"].active { background: linear-gradient(135deg, #0078D4, #005A9E); border-color: #0078D4; color: #fff; box-shadow: 0 0 25px rgba(0, 120, 212, 0.6); }
+        .category-menu button[data-category="diger"].active { background: linear-gradient(135deg, #FF9800, #F57C00); border-color: #FF9800; color: #fff; box-shadow: 0 0 25px rgba(255, 152, 0, 0.6); }
+
+        /* SAYFA BAŞLIĞI */
+        .page-header {
+            padding: 20px 24px 0; display: flex; align-items: center;
+            justify-content: space-between; flex-wrap: wrap; gap: 12px;
+        }
+
+        .page-header h2 {
+            font-family: 'Bebas Neue', sans-serif; font-size: 26px;
+            font-weight: 400; letter-spacing: 2px; color: #fff;
+        }
+
+        .page-header h2 span { color: #00e5ff; text-shadow: 0 0 20px rgba(0, 229, 255, 0.4); }
+
+        .pagination { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        .pagination button {
+            background: rgba(15, 20, 24, 0.8); border: 1px solid rgba(0, 229, 255, 0.2);
+            color: #80deea; padding: 6px 12px; border-radius: 6px;
+            cursor: pointer; font-weight: 700; font-size: 13px;
+            transition: all 0.25s ease;
+        }
+
+        .pagination button:hover { border-color: #00e5ff; color: #fff; box-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
+        .pagination button.active {
+            background: linear-gradient(135deg, #00e5ff, #00b8d4);
+            border-color: #00e5ff; color: #05080a;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+        }
+
+        /* ANA İÇERİK */
+        .container {
+            display: flex; max-width: 1600px; margin: 0 auto;
+            padding: 20px 24px; gap: 20px; position: relative;
+        }
+
+        .games-grid {
+            flex: 1; display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px; align-content: start;
+        }
+
+        /* KART */
+        .game-card {
+            background: rgba(15, 20, 24, 0.7); border: 1px solid rgba(0, 229, 255, 0.1);
+            border-radius: 10px; overflow: hidden; cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex; flex-direction: column; backdrop-filter: blur(4px);
+        }
+
+        .game-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            border-color: #00e5ff; box-shadow: 0 10px 35px rgba(0, 229, 255, 0.25);
+            background: rgba(15, 20, 24, 0.9);
+        }
+
+        .game-card .card-img-wrap { position: relative; overflow: hidden; background: #05080a; }
+        .game-card img {
+            width: 100%; aspect-ratio: 3/4; object-fit: cover;
+            display: block; transition: transform 0.5s ease;
+        }
+
+        .game-card:hover img { transform: scale(1.06); }
+
+        .game-card .card-img-wrap .tag {
+            position: absolute; top: 8px; left: 8px;
+            color: #05080a; font-size: 10px; font-weight: 900;
+            padding: 3px 8px; border-radius: 4px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .game-card .card-info {
+            padding: 10px 12px 12px; display: flex;
+            flex-direction: column; gap: 8px; flex: 1;
+        }
+
+        .game-card .card-info .category {
+            font-size: 10px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .game-card .card-info h3 {
+            font-size: 13px; font-weight: 600; line-height: 1.3;
+            color: #fff; display: -webkit-box;
+            -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; text-overflow: ellipsis; min-height: 34px;
+        }
+
+        .game-card .card-info .listing-price {
+            font-family: 'Bebas Neue', sans-serif; font-size: 24px;
+            letter-spacing: 1px; line-height: 1;
+            display: flex; align-items: baseline; gap: 4px;
+        }
+
+        .game-card .card-info .listing-price span {
+            font-size: 14px; color: #fff; opacity: 0.7;
+        }
+
+        .game-card .card-actions {
+            display: flex; gap: 6px; align-items: center; margin-top: auto;
+        }
+
+        .game-card .card-actions .btn-buy {
+            flex: 1; border: none; padding: 9px 12px;
+            border-radius: 6px; font-size: 12px; font-weight: 900;
+            cursor: pointer; transition: all 0.25s;
+            text-align: center; text-decoration: none;
+            display: flex; align-items: center; justify-content: center;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* SAĞ PANEL */
+        .detail-panel {
+            width: 320px; flex-shrink: 0;
+            background: rgba(10, 15, 20, 0.9); backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 229, 255, 0.15); border-radius: 12px;
+            padding: 20px; position: sticky; top: 90px;
+            height: fit-content; max-height: calc(100vh - 110px);
+            overflow-y: auto; box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .detail-panel::-webkit-scrollbar { width: 4px; }
+        .detail-panel::-webkit-scrollbar-track { background: transparent; }
+        .detail-panel::-webkit-scrollbar-thumb { background: #00e5ff; border-radius: 4px; }
+
+        .detail-panel .placeholder {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 250px; color: #4a6a7a;
+            text-align: center; gap: 10px;
+        }
+
+        .detail-panel .placeholder p { font-size: 13px; font-weight: 500; }
+
+        .detail-panel .detail-content {
+            display: none; flex-direction: column; gap: 14px;
+        }
+
+        .detail-panel .detail-content.active { display: flex; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .detail-panel .detail-content img {
+            width: 100%; aspect-ratio: 3/4; object-fit: cover;
+            border-radius: 10px; border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .detail-panel .detail-content h2 {
+            font-size: 18px; font-weight: 700; color: #fff; line-height: 1.3;
+        }
+
+        .detail-panel .detail-content .game-meta {
+            display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px;
+        }
+
+        .detail-panel .detail-content .game-meta span {
+            background: rgba(0, 229, 255, 0.08); padding: 4px 10px;
+            border-radius: 16px; border: 1px solid rgba(0, 229, 255, 0.15);
+            color: #80deea;
+        }
+
+        .detail-panel .detail-content .detail-price {
+            font-family: 'Bebas Neue', sans-serif; font-size: 36px;
+            letter-spacing: 2px; text-align: center; padding: 14px 0;
+            line-height: 1; border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .detail-panel .detail-content .detail-price span {
+            font-size: 20px; color: #fff; opacity: 0.8;
+        }
+
+        .detail-panel .detail-content .detail-desc {
+            font-size: 13px; color: #80a0b0; line-height: 1.6; padding: 8px 0;
+        }
+
+        .detail-panel .btn-buy {
+            display: block; width: 100%; padding: 14px; border: none;
+            border-radius: 8px; color: #05080a; font-size: 15px;
+            font-weight: 900; text-transform: uppercase;
+            letter-spacing: 1.5px; cursor: pointer;
+            text-decoration: none; text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        /* BOOST EKRANI */
+        .boost-container {
+            flex: 1; display: flex; flex-direction: column; gap: 24px;
+        }
+
+        .boost-card {
+            background: rgba(15, 20, 35, 0.85); backdrop-filter: blur(16px);
+            border: 1px solid rgba(88, 101, 242, 0.3); border-radius: 16px;
+            padding: 32px; box-shadow: 0 10px 50px rgba(88, 101, 242, 0.15);
+            position: relative; overflow: hidden;
+        }
+
+        .boost-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 2px; background: linear-gradient(90deg, transparent, #5865F2, transparent);
+        }
+
+        .boost-header {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 28px;
+        }
+
+        .boost-title {
+            display: flex; align-items: center; gap: 12px;
+            font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+            letter-spacing: 2px; color: #fff;
+        }
+
+        .boost-title i {
+            color: #5865F2; font-size: 28px;
+            filter: drop-shadow(0 0 15px rgba(88, 101, 242, 0.6));
+        }
+
+        .boost-badge {
+            background: rgba(88, 101, 242, 0.15);
+            border: 1px solid rgba(88, 101, 242, 0.4);
+            color: #5865F2; font-size: 11px; font-weight: 700;
+            padding: 6px 14px; border-radius: 20px;
+            letter-spacing: 0.5px; text-transform: uppercase;
+        }
+
+        .quick-select-label {
+            font-size: 12px; color: #7a8aaa; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
+        }
+
+        .quick-select {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; margin-bottom: 32px;
+        }
+
+        .quick-btn {
+            background: rgba(20, 25, 45, 0.8);
+            border: 1.5px solid rgba(88, 101, 242, 0.25);
+            border-radius: 10px; padding: 18px 8px; color: #fff;
+            font-size: 20px; font-weight: 800;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px; cursor: pointer;
+            transition: all 0.25s ease; text-align: center;
+        }
+
+        .quick-btn:hover {
+            border-color: #5865F2; background: rgba(30, 40, 70, 0.9);
+            transform: translateY(-3px); box-shadow: 0 8px 25px rgba(88, 101, 242, 0.3);
+        }
+
+        .quick-btn.active {
+            background: linear-gradient(135deg, #5865F2, #4752C4);
+            border-color: #5865F2;
+            box-shadow: 0 0 30px rgba(88, 101, 242, 0.6);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .slider-wrap { margin-bottom: 28px; }
+        .slider-container { position: relative; height: 8px; margin: 20px 0 30px; }
+        .slider-track {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 40, 70, 0.8); border-radius: 4px; overflow: hidden;
+        }
+
+        .slider-fill {
+            position: absolute; top: 0; left: 0; height: 100%;
+            background: linear-gradient(90deg, #5865F2, #7289DA);
+            border-radius: 4px; transition: width 0.15s ease;
+            box-shadow: 0 0 15px rgba(88, 101, 242, 0.6);
+        }
+
+        input[type="range"].boost-range {
+            position: absolute; top: -10px; left: 0; width: 100%; height: 28px;
+            -webkit-appearance: none; appearance: none;
+            background: transparent; cursor: pointer; z-index: 5;
+        }
+
+        input[type="range"].boost-range::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: #fff; border: 4px solid #5865F2;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(88, 101, 242, 0.8);
+        }
+
+        .boost-result {
+            background: rgba(20, 25, 45, 0.6);
+            border: 1.5px solid rgba(88, 101, 242, 0.25);
+            border-radius: 14px; padding: 28px;
+            text-align: center; margin-bottom: 20px;
+            position: relative; overflow: hidden;
+        }
+
+        .boost-result-text {
+            font-size: 16px; color: #7a8aaa; font-weight: 600;
+            letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;
+        }
+
+        .boost-result-value {
+            font-family: 'Bebas Neue', sans-serif; font-size: 72px;
+            line-height: 1; color: #5865F2; letter-spacing: 3px;
+            text-shadow: 0 0 40px rgba(88, 101, 242, 0.6);
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+
+        .boost-result-value small { font-size: 24px; color: #fff; opacity: 0.7; }
+
+        .boost-total {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 0; border-top: 1px solid rgba(88, 101, 242, 0.2);
+            margin-top: 8px;
+        }
+
+        .level-info {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; color: #5865F2; font-weight: 700;
+        }
+
+        .level-info span { color: #7a8aaa; font-weight: 500; }
+        .total-price-wrap { text-align: right; }
+
+        .total-label {
+            font-size: 12px; color: #7a8aaa; letter-spacing: 2px;
+            text-transform: uppercase; margin-bottom: 4px; font-weight: 700;
+        }
+
+        .total-price {
+            font-family: 'Bebas Neue', sans-serif; font-size: 36px;
+            color: #5865F2; letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(88, 101, 242, 0.5); line-height: 1;
+        }
+
+        .total-price span { font-size: 20px; color: #fff; opacity: 0.8; }
+
+        .boost-buy-btn {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; width: 100%; padding: 18px;
+            background: linear-gradient(135deg, #5865F2, #4752C4);
+            border: none; border-radius: 12px; color: #fff;
+            font-size: 16px; font-weight: 900; text-transform: uppercase;
+            letter-spacing: 2px; cursor: pointer; text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(88, 101, 242, 0.4);
+            margin-top: 20px;
+        }
+
+        .boost-buy-btn:hover {
+            background: linear-gradient(135deg, #7289DA, #5865F2);
+            box-shadow: 0 0 50px rgba(88, 101, 242, 0.8);
+            transform: translateY(-3px);
+        }
+
+        .boost-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+        }
+
+        .boost-info-card {
+            background: rgba(15, 20, 35, 0.6);
+            border: 1px solid rgba(88, 101, 242, 0.2);
+            border-radius: 12px; padding: 20px;
+            display: flex; align-items: center; gap: 14px;
+            transition: all 0.25s ease;
+        }
+
+        .boost-info-card:hover { border-color: rgba(88, 101, 242, 0.5); transform: translateY(-2px); }
+        .boost-info-card i {
+            font-size: 24px; color: #5865F2;
+            filter: drop-shadow(0 0 10px rgba(88, 101, 242, 0.5));
+        }
+
+        .boost-info-card div h4 { font-size: 13px; color: #fff; font-weight: 700; margin-bottom: 2px; }
+        .boost-info-card div p { font-size: 11px; color: #7a8aaa; }
+
+        /* GERİ BUTONU */
+        .back-btn {
+            background: rgba(88, 101, 242, 0.15);
+            border: 1px solid rgba(88, 101, 242, 0.4);
+            color: #5865F2; padding: 10px 18px; border-radius: 8px;
+            cursor: pointer; font-weight: 700; font-size: 13px;
+            margin-bottom: 16px; display: inline-flex;
+            align-items: center; gap: 8px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.25s ease; letter-spacing: 1px;
+        }
+
+        .back-btn:hover {
+            background: rgba(88, 101, 242, 0.25);
+            box-shadow: 0 0 20px rgba(88, 101, 242, 0.4);
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center; padding: 28px 16px; color: #4a6a7a;
+            font-size: 12px; border-top: 1px solid rgba(0, 229, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        footer a { color: #00e5ff; text-decoration: none; font-weight: 700; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #05080a; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.3); border-radius: 4px; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .container { flex-direction: column; padding: 16px; }
+            .detail-panel { width: 100%; position: static; max-height: none; }
+            .games-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+            .top-bar { padding: 10px 16px; flex-wrap: wrap; }
+            .search-bar { order: 3; max-width: 100%; flex-basis: 100%; }
+            .logo img { height: 40px; width: 40px; }
+            .logo-text { font-size: 22px; }
+        }
+
+        @media (max-width: 480px) {
+            .games-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .game-card .card-info h3 { font-size: 11px; min-height: 28px; }
+            .game-card .card-actions .btn-buy { font-size: 10px; padding: 7px 8px; }
+            .category-menu { padding: 8px 12px; gap: 6px; }
+            .category-menu button { font-size: 10px; padding: 6px 10px; }
+            .page-header { padding: 12px 16px 0; }
+            .page-header h2 { font-size: 18px; }
+            .logo-text { font-size: 18px; }
+            .logo img { height: 34px; width: 34px; }
+            .game-card .card-info .listing-price { font-size: 20px; }
+            .boost-card { padding: 18px; }
+            .boost-result-value { font-size: 48px; }
+            .total-price { font-size: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CİHAZ SEÇİM EKRANI -->
+    <div class="device-modal" id="deviceModal">
+        <div class="device-modal-content">
+            <img src="https://i.ibb.co/Y72G36MQ/35e56b6a-bb25-4c38-be32-0087931c23bf-1.png" alt="BwranShop Logo">
+            <h1>BWRAN<span>SHOP</span></h1>
+            <p>Cihazını seç ve alışverişe başla</p>
+            <div class="device-options">
+                <button class="device-btn" onclick="selectDevice('mobile')">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>MOBİL</span>
+                    <small>Telefon / Tablet</small>
+                </button>
+                <button class="device-btn" onclick="selectDevice('desktop')">
+                    <i class="fas fa-desktop"></i>
+                    <span>BİLGİSAYAR</span>
+                    <small>PC / Laptop</small>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ÜST BAR -->
+    <div class="top-bar">
+        <a href="#" class="logo">
+            <img src="https://i.ibb.co/Y72G36MQ/35e56b6a-bb25-4c38-be32-0087931c23bf-1.png" alt="BwranShop Logo">
+            <div class="logo-text">BWRAN<span>SHOP</span></div>
+        </a>
+        <div class="search-bar">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" id="searchInput" placeholder="Ürün ara...">
+        </div>
+    </div>
+
+    <!-- KATEGORİ MENÜSÜ -->
+    <div class="category-menu" id="categoryMenu">
+        <button class="active" data-category="steam" onclick="switchCategory('steam')">
+            <i class="fab fa-steam"></i> STEAM
+        </button>
+        <button data-category="discord" onclick="switchCategory('discord')">
+            <i class="fab fa-discord"></i> DISCORD
+        </button>
+        <button data-category="telegram" onclick="switchCategory('telegram')">
+            <i class="fab fa-telegram"></i> TELEGRAM
+        </button>
+        <button data-category="instagram" onclick="switchCategory('instagram')">
+            <i class="fab fa-instagram"></i> INSTAGRAM
+        </button>
+        <button data-category="spotify" onclick="switchCategory('spotify')">
+            <i class="fab fa-spotify"></i> SPOTIFY
+        </button>
+        <button data-category="twitter" onclick="switchCategory('twitter')">
+            <i class="fab fa-twitter"></i> TWITTER
+        </button>
+        <button data-category="facebook" onclick="switchCategory('facebook')">
+            <i class="fab fa-facebook"></i> FACEBOOK
+        </button>
+        <button data-category="windows" onclick="switchCategory('windows')">
+            <i class="fab fa-windows"></i> WINDOWS
+        </button>
+        <button data-category="diger" onclick="switchCategory('diger')">
+            <i class="fas fa-box"></i> DİĞER
+        </button>
+    </div>
+
+    <!-- SAYFA BAŞLIĞI -->
+    <div class="page-header">
+        <h2 id="pageTitle">STEAM <span>— OYUNLAR</span></h2>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- ANA İÇERİK -->
+    <div class="container">
+        <div class="games-grid" id="gamesGrid"></div>
+
+        <!-- BOOST PANELİ (gizli) -->
+        <div class="boost-container" id="boostContainer" style="display: none;">
+            <button class="back-btn" onclick="closeBoostPanel()">
+                <i class="fas fa-arrow-left"></i> GERİ DÖN
+            </button>
+            <div class="boost-card">
+                <div class="boost-header">
+                    <div class="boost-title">
+                        <i class="fas fa-rocket"></i>
+                        Boost Miktarı
+                    </div>
+                    <div class="boost-badge">Sadece Çift Sayılar</div>
+                </div>
+                <div class="quick-select-label">Hızlı Seçim:</div>
+                <div class="quick-select">
+                    <button class="quick-btn" onclick="setBoost(8)">8x</button>
+                    <button class="quick-btn" onclick="setBoost(10)">10x</button>
+                    <button class="quick-btn" onclick="setBoost(12)">12x</button>
+                    <button class="quick-btn" onclick="setBoost(14)">14x</button>
+                </div>
+                <div class="slider-wrap">
+                    <div class="slider-container">
+                        <div class="slider-track">
+                            <div class="slider-fill" id="sliderFill"></div>
+                        </div>
+                        <input type="range" class="boost-range" id="boostRange" min="8" max="32" step="2" value="8" oninput="updateBoost(this.value)">
+                    </div>
+                </div>
+                <div class="boost-result">
+                    <div class="boost-result-text">Seçilen Miktar</div>
+                    <div class="boost-result-value">
+                        <span id="boostValue">8</span>
+                        <small>BOOST</small>
+                    </div>
+                </div>
+                <div class="boost-total">
+                    <div class="level-info">
+                        <i class="fas fa-level-up-alt"></i>
+                        <span id="levelText">Seviye 1 - Tüm özellikler aktif! 🎉</span>
+                    </div>
+                    <div class="total-price-wrap">
+                        <div class="total-label">Toplam Fiyat</div>
+                        <div class="total-price"><span id="totalPrice">90</span> <span>TL</span></div>
+                    </div>
+                </div>
+                <a href="https://www.itemsatis.com/p/bwranshop" target="_blank" class="boost-buy-btn">
+                    <i class="fas fa-shopping-cart"></i>
+                    SATIN AL
+                </a>
+            </div>
+            <div class="boost-info-grid">
+                <div class="boost-info-card">
+                    <i class="fas fa-bolt"></i>
+                    <div>
+                        <h4>Anında Teslimat</h4>
+                        <p>Ödeme sonrası saniyeler içinde</p>
+                    </div>
+                </div>
+                <div class="boost-info-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <h4>%100 Güvenli</h4>
+                        <p>Resmi Discord boost hizmeti</p>
+                    </div>
+                </div>
+                <div class="boost-info-card">
+                    <i class="fas fa-headset"></i>
+                    <div>
+                        <h4>7/24 Destek</h4>
+                        <p>Her zaman yanınızdayız</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAĞ PANEL -->
+        <div class="detail-panel" id="detailPanel">
+            <div class="placeholder" id="placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#00e5ff" width="48" height="48" style="opacity:0.4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                </svg>
+                <p>Bir ürüne tıkla, detaylar burada görünsün</p>
+            </div>
+            <div class="detail-content" id="detailContent">
+                <img id="detailImg" src="" alt="Ürün görseli">
+                <h2 id="detailTitle"></h2>
+                <div class="game-meta" id="detailMeta"></div>
+                <div class="detail-price" id="detailPrice" style="display: none;"></div>
+                <div class="detail-desc" id="detailDesc" style="display: none;"></div>
+                <a href="https://www.itemsatis.com/p/bwranshop" target="_blank" class="btn-buy" id="detailBuyBtn">SATIN AL</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 <a href="https://www.itemsatis.com/p/bwranshop" target="_blank">BwranShop</a> — Tüm hakları saklıdır.
+    </footer>
+
+    <script>
+        // CİHAZ SEÇİMİ
+        function selectDevice(device) {
+            const modal = document.getElementById('deviceModal');
+            if (device === 'mobile') {
+                document.body.classList.add('mobile-mode');
+            } else {
+                document.body.classList.remove('mobile-mode');
+            }
+            localStorage.setItem('bwranshop_device', device);
+            modal.classList.add('hidden');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedDevice = localStorage.getItem('bwranshop_device');
+            const modal = document.getElementById('deviceModal');
+            if (savedDevice) {
+                modal.classList.add('hidden');
+                if (savedDevice === 'mobile') {
+                    document.body.classList.add('mobile-mode');
+                }
+            }
+        });
+
+        // ===== STEAM OYUNLARI (288 oyun) =====
+        const steamGames = [
+            ["Counter-Strike 2", 730, 100], ["Dota 2", 570, 99], ["PUBG: Battlegrounds", 578080, 98], ["Apex Legends", 1172470, 97], ["Grand Theft Auto V Enhanced", 3240220, 96], ["Destiny 2", 1085660, 95], ["NARAKA: BLADEPOINT", 1203220, 94], ["Team Fortress 2", 440, 93], ["Rust", 252490, 92], ["Warframe", 230410, 91], ["Path of Exile", 238960, 90], ["Black Myth: Wukong", 2358720, 89], ["ELDEN RING", 1245620, 88], ["Baldur's Gate 3", 1086940, 87], ["Cyberpunk 2077", 1091500, 86], ["Red Dead Redemption 2", 1174180, 85], ["Hogwarts Legacy", 990080, 84], ["Palworld", 1623730, 83], ["Lethal Company", 1966720, 82], ["Stardew Valley", 413150, 81], ["Terraria", 105600, 80], ["Hollow Knight", 367520, 79], ["Hades", 1145360, 78], ["Valheim", 892970, 77], ["Phasmophobia", 739630, 76], ["Dead by Daylight", 381210, 75], ["Grand Theft Auto IV: The Complete Edition", 12210, 74], ["God of War", 1593500, 73], ["God of War Ragnarök", 2322010, 72], ["The Witcher 3: Wild Hunt", 292030, 71], ["Sekiro™: Shadows Die Twice - GOTY Edition", 814380, 70], ["DARK SOULS™ III", 374320, 69], ["Resident Evil 4 (2005)", 254700, 68], ["Resident Evil 7 Biohazard", 418370, 67], ["Resident Evil 5", 21690, 66], ["Devil May Cry 5", 601150, 65], ["Monster Hunter: World", 582010, 64], ["Far Cry® 5", 552520, 63], ["Far Cry® 3", 220240, 62], ["Assassin's Creed® Origins", 582160, 61], ["Assassin's Creed Unity", 289650, 60], ["Tom Clancy's Rainbow Six Siege", 359550, 59], ["FOR HONOR™", 304390, 58], ["Need for Speed™ Heat", 1222680, 57], ["Battlefield™ V", 1237950, 56], ["Call of Duty: Black Ops III", 311210, 55], ["Call of Duty: WWII", 476600, 54], ["Call of Duty: Modern Warfare 2 (2009)", 10180, 53], ["Call of Duty 4: Modern Warfare (2007)", 7940, 52], ["Call of Duty: Black Ops II", 202970, 51], ["Mortal Kombat 11", 976310, 50], ["Mortal Kombat 1", 1971870, 49], ["Injustice: Gods Among Us Ultimate Edition", 242700, 48], ["DRAGON BALL XENOVERSE", 323470, 47], ["Deep Rock Galactic", 548430, 44], ["Insurgency: Sandstorm", 581320, 43], ["Left 4 Dead 2", 550, 42], ["Left 4 Dead", 500, 41], ["Portal 2", 620, 40], ["Portal", 400, 39], ["Half-Life 2", 220, 38], ["Half-Life", 70, 37], ["Halo: The Master Chief Collection", 976730, 36], ["Titanfall® 2", 1237970, 35], ["The Forest", 242760, 33], ["Sons of the Forest", 1326470, 32], ["Raft", 648800, 31], ["Subnautica", 264710, 30], ["No Man's Sky", 275850, 29], ["ASTRONEER", 361420, 28], ["Satisfactory", 526870, 27], ["Factorio", 427520, 26], ["Cities: Skylines", 255710, 25], ["Euro Truck Simulator 2", 227300, 24], ["American Truck Simulator", 270880, 23], ["BeamNG.drive", 284160, 22], ["Assetto Corsa", 244210, 21], ["DiRT Rally 2.0", 690790, 20], ["Project Zomboid", 108600, 19], ["7 Days to Die", 251570, 18], ["DayZ", 221100, 17], ["ARK: Survival Evolved", 346110, 16], ["ARK: Survival Ascended", 2399830, 15], ["Conan Exiles", 440900, 14], ["Garry's Mod", 4000, 12], ["Human: Fall Flat", 477160, 11], ["Gang Beasts", 285900, 10], ["Overcooked! 2", 728880, 9], ["Among Us", 945360, 8], ["Fall Guys", 1097150, 7], ["Rocket League", 252950, 6], ["Brawlhalla", 291550, 5], ["Tom Clancy's The Division 2", 2221490, 4], ["Lost Ark", 1599340, 0], ["New World", 1063730, -1], ["Throne and Liberty", 2429640, -3], ["Black Desert Online", 582660, -4], ["Final Fantasy XIV Online", 39210, -5], ["The Elder Scrolls Online", 306130, -7], ["Star Wars: The Old Republic", 1286830, -9], ["Phantasy Star Online 2", 1056640, -10], ["Age of Empires II (2013)", 221380, 46], ["Age of Empires II: Definitive Edition", 813780, 45], ["Tomb Raider Game of the Year", 203160, 43], ["Tropico 6", 492720, 42], ["Kingdom Come: Deliverance", 379430, 41], ["Kingdom Come: Deliverance II", 1771300, 40], ["Mafia III: Definitive Edition", 360430, 39], ["Shadow Tactics: Blades of the Shogun", 418240, 38], ["Shadow of the Tomb Raider", 750920, 37], ["Sid Meier's Civilization VI", 289070, 36], ["Detroit: Become Human", 1222140, 35], ["House Flipper", 613100, 34], ["Internet Cafe Simulator 2", 1258000, 33], ["Warhammer 40,000: Inquisitor - Prophecy", 857080, 32], ["A Story About My Uncle", 278360, 31], ["BioShock", 7670, 29], ["BioShock Remastered", 409710, 28], ["Borderlands GOTY", 8980, 27], ["Borderlands GOTY Enhanced", 1018230, 26], ["Call of Duty (2003)", 2620, 25], ["Call of Duty 2", 2630, 24], ["Call of Duty: Advanced Warfare", 209650, 23], ["Call of Duty: Black Ops", 42700, 22], ["Call of Duty: Ghosts", 209160, 21], ["Call of Duty: Infinite Warfare", 292730, 20], ["Call of Duty: Modern Warfare Remastered (2017)", 393080, 19], ["Call of Duty: United Offensive", 2640, 18], ["Call of Duty: World at War", 10090, 17], ["Castle Crashers", 204360, 16], ["Company of Heroes", 2280, 15], ["Company of Heroes 2", 231430, 14], ["Content Warning", 2881650, 13], ["Craftopia", 1307550, 12], ["Crysis 2 Maximum Edition", 99830, 11], ["Darkest Dungeon®", 262060, 10], ["Darksiders Genesis", 710920, 9], ["DAVE THE DIVER", 1868140, 8], ["Day of Defeat", 30, 7], ["Dead Space (2008)", 17470, 6], ["Deathmatch Classic", 40, 5], ["DEVOUR", 1274570, 4], ["Dino D-Day", 70000, 3], ["Dishonored 2", 403640, 2], ["DLC Quest", 230050, 1], ["Don't Starve", 219740, 0], ["Don't Starve Together", 322330, -1], ["Drawful 2", 442070, -2], ["DYNASTY WARRIORS 7: Xtreme Legends Definitive Edition", 968790, -3], ["EA SPORTS™ WRC", 1849250, -4], ["Fallout: New Vegas", 22380, -5], ["Five Nights at Freddy's", 319510, -8], ["GORN", 578620, -10], ["Grim Fandango Remastered", 316790, -12], ["Gunfire Reborn", 1217060, -13], ["Half-Life Deathmatch: Source", 360, -14], ["Half-Life: Blue Shift", 130, -15], ["Half-Life: Opposing Force", 50, -16], ["Half-Life: Source", 280, -17], ["Hearts of Iron IV", 394360, -18], ["Hollow Knight: Silksong", 1030300, -22], ["Homefront®: The Revolution", 223100, -23], ["iRacing", 266410, -25], ["Just Cause™ 3", 225540, -26], ["Killing Floor", 1250, -27], ["Labyrinthine", 1302240, -28], ["LARA CROFT AND THE TEMPLE OF OSIRIS™", 289690, -29], ["Last Epoch", 899770, -30], ["Little Nightmares", 424840, -43], ["Max Payne 3", 204100, -45], ["Metro 2033 Redux", 286690, -46], ["Metro Exodus", 412020, -47], ["Mirror's Edge", 17410, -48], ["Mount & Blade: Warband", 48700, -49], ["ORION: Prelude", 104900, -55], ["PAYDAY: The Heist", 24240, -58], ["POSTAL 2", 223470, -62], ["Ricochet", 60, -68], ["Rise of the Tomb Raider", 391220, -69], ["Sniper Elite 4", 312660, -76], ["Slay the Spire", 646570, -79], ["STAR WARS Jedi: Fallen Order™", 1172380, -80], ["Tabletop Simulator", 286160, -84], ["Team Fortress Classic", 20, -85], ["Temtem", 745920, -86], ["The Binding of Isaac", 113200, -87], ["The Elder Scrolls III: Morrowind", 22320, -89], ["The Elder Scrolls V: Skyrim", 72850, -90], ["The Elder Scrolls V: Skyrim Special Edition", 489830, -91], ["The Stanley Parable", 221910, -94], ["The Wolf Among Us", 250320, -96], ["Titan Quest Anniversary Edition", 475150, -98], ["Titan Souls", 297130, -99], ["Toki Tori", 38700, -100], ["Torchlight II", 200710, -101], ["Total War: ATTILA", 325610, -102], ["Total War: THREE KINGDOMS", 779340, -103], ["Two Point Hospital", 535930, -105], ["Warhammer 40,000: Inquisitor - Martyr", 527430, -108], ["Warhammer: Vermintide 2", 552500, -109], ["BattleBlock Theater", 238280, -120], ["BattleBit Remastered", 1909180, -121], ["Braveland", 285080, -122],
+            // Ek oyunlar
+            ["Sid Meier's Civilization VI", 289070, 36], ["Warhammer 40,000: Inquisitor - Prophecy", 857080, 32], ["A Story About My Uncle", 278360, 31], ["BioShock", 7670, 29], ["BioShock Remastered", 409710, 28], ["Borderlands GOTY", 8980, 27], ["Borderlands GOTY Enhanced", 1018230, 26], ["Braveland", 285080, 25], ["Call of Duty (2003)", 2620, 24], ["Call of Duty 2", 2630, 23], ["Call of Duty 4: Modern Warfare (2007)", 7940, 22], ["Call of Duty: Advanced Warfare", 209650, 21], ["Call of Duty: Black Ops", 42700, 20], ["Call of Duty: Black Ops II", 202970, 19], ["Call of Duty: Black Ops III", 311210, 18], ["Call of Duty: Ghosts", 209160, 17], ["Call of Duty: Infinite Warfare", 292730, 16], ["Call of Duty: Modern Warfare 2 (2009)", 10180, 15], ["Call of Duty: Modern Warfare Remastered (2017)", 393080, 14], ["Call of Duty: United Offensive", 2640, 13], ["Call of Duty: World at War", 10090, 12], ["Call of Duty: WWII", 476600, 11], ["Castle Crashers", 204360, 10], ["Company of Heroes", 2280, 9], ["Company of Heroes 2", 231430, 8], ["Content Warning", 2881650, 7], ["Craftopia", 1307550, 6], ["Crash Time 2", 0, 5], ["Crysis 2 Maximum Edition", 99830, 4], ["DARK SOULS™ III", 374320, 3], ["Darkest Dungeon®", 262060, 2], ["Darksiders Genesis", 710920, 1], ["DAVE THE DIVER", 1868140, 0], ["Day of Defeat", 30, -1], ["Dead Space (2008)", 17470, -2], ["Deathmatch Classic", 40, -3], ["Deep Rock Galactic", 548430, -4], ["Devil May Cry 5", 601150, -5], ["DEVOUR", 1274570, -6], ["Dino D-Day", 70000, -7], ["DiRT Rally 2.0", 690790, -8], ["Dishonored 2", 403640, -9], ["DLC Quest", 230050, -10], ["Don't Starve", 219740, -11], ["Don't Starve Together", 322330, -12], ["DRAGON BALL XENOVERSE", 323470, -13], ["Drawful 2", 442070, -14], ["Dying Light: The Beast", 0, -15], ["DYNASTY WARRIORS 7: Xtreme Legends Definitive Edition", 968790, -16], ["DYNASTY WARRIORS: ORIGINS", 0, -17], ["EA SPORTS™ WRC", 1849250, -18], ["Easy Red", 0, -19], ["ELDEN RING", 1245620, -20], ["Euro Truck Simulator 2", 227300, -21], ["Everafter Falls", 0, -22], ["Extreme Offroad Monster Simulator", 0, -23], ["Fable - The Lost Chapters", 0, -24], ["Fallout: New Vegas", 22380, -25], ["Far Cry® 3", 220240, -26], ["Feed and Grow: Fish", 0, -27], ["Fellowship", 0, -28], ["Figment", 0, -29], ["FINAL FANTASY® XI: Ultimate Collection Seekers Edition NA", 0, -30], ["Five Nights at Freddy's", 319510, -31], ["FOR HONOR™", 304390, -32], ["For The King", 0, -33], ["Gang Beasts", 285900, -34], ["Garry's Mod", 4000, -35], ["GORN", 578620, -36], ["Gothic II: Gold Classic", 0, -37], ["Grim Fandango Remastered", 316790, -38], ["Gunfire Reborn", 1217060, -39], ["GUNTOUCHABLES", 0, -40], ["Hades", 1145360, -41], ["Half-Life", 70, -42], ["Half-Life 2", 220, -43], ["Half-Life Deathmatch: Source", 360, -44], ["Half-Life: Blue Shift", 130, -45], ["Half-Life: Opposing Force", 50, -46], ["Half-Life: Source", 280, -47], ["Halo: The Master Chief Collection", 976730, -48], ["Headsnatchers", 0, -49], ["Hearts of Iron IV", 394360, -50], ["Hellcoming", 0, -51], ["Hexcells", 0, -52], ["Hexcells Infinite", 0, -53], ["Hexcells Plus", 0, -54], ["Hide and Seek", 0, -55], ["Hogwarts Legacy", 990080, -56], ["Hollow Knight", 367520, -57], ["Hollow Knight: Silksong", 1030300, -58], ["Homefront®: The Revolution", 223100, -59], ["Hungry Flame", 0, -60], ["Huntsman - The Orphanage Halloween Edition", 0, -61], ["Initial Drift Online", 0, -62], ["Injustice: Gods Among Us Ultimate Edition", 242700, -63], ["Insurgency: Sandstorm", 581320, -64], ["iRacing", 266410, -65], ["I'm not a Monster", 0, -66], ["Jagged Alliance 1: Gold Edition", 0, -67], ["Just Cause™ 3", 225540, -68], ["Kandidatos", 0, -69], ["Killing Floor", 1250, -70], ["Labyrinthine", 1302240, -71], ["LARA CROFT AND THE TEMPLE OF OSIRIS™", 289690, -72], ["Last Epoch", 899770, -73], ["Left 4 Dead", 500, -74], ["Left 4 Dead 2", 550, -75], ["LEGO® City Undercover", 0, -76], ["LEGO® Harry Potter: Years 1-4", 0, -77], ["LEGO® Harry Potter: Years 5-7", 0, -78], ["LEGO® Indiana Jones™ 2: The Adventure Continues", 0, -79], ["LEGO® Jurassic World", 0, -80], ["LEGO® MARVEL Super Heroes", 0, -81], ["LEGO® MARVEL Super Heroes 2", 0, -82], ["LEGO® MARVEL's Avengers", 0, -83], ["LEGO® Pirates of the Caribbean The Video Game", 0, -84], ["LEGO® Star Wars™: The Complete Saga", 0, -85], ["LEGO® STAR WARS™: The Force Awakens", 0, -86], ["LEGO® The Hobbit™", 0, -87], ["LEGO® The Incredibles", 0, -88], ["LEGO® The Lord of the Rings™", 0, -89], ["LEGO® Worlds", 0, -90], ["LEGOⓇ Indiana Jones™: The Original Adventures", 0, -91], ["Lethal Company", 1966720, -92], ["Liar's Bar", 0, -93], ["Little Nightmares", 424840, -94], ["Lossless Scaling", 0, -95], ["Lost Castle 2", 0, -96], ["Max Payne 3", 204100, -97], ["McPixel", 0, -98], ["Medal of Honor(TM) Multiplayer", 0, -99], ["Medal of Honor(TM) Single Player", 0, -100], ["Metro 2033 Redux", 286690, -101], ["Metro Exodus", 412020, -102], ["Mirror's Edge", 17410, -103], ["Monster Energy Supercross - The Official Videogame 3", 0, -104], ["Monster Jam Steel Titans 2", 0, -105], ["Mount & Blade: Warband", 48700, -106], ["Mr. Dubstep", 0, -107], ["MX vs ATV All Out", 0, -108], ["MY HERO ONE'S JUSTICE 2", 0, -109], ["NARUTO SHIPPUDEN: Ultimate Ninja STORM 3 Full Burst", 0, -110], ["NeverEnd", 0, -111], ["Nine Sols", 0, -112], ["NOBUNAGA'S AMBITION: Souzou", 0, -113], ["One Gun Guy", 0, -114], ["ORION: Prelude", 104900, -115], ["Overcooked! 2", 728880, -116], ["Pacify", 0, -117], ["Palworld", 1623730, -118], ["PANICORE", 0, -119], ["PAYDAY: The Heist", 24240, -120], ["PCMark 10", 0, -121], ["PEAK", 0, -122], ["Plants vs. Zombies™ Garden Warfare 2: Deluxe Sürüm", 0, -123], ["Portal", 400, -124], ["Portal 2", 620, -125], ["POSTAL 2", 223470, -126], ["Pro Soccer Online", 0, -127], ["Project Zomboid", 108600, -128], ["R.E.P.O.", 0, -129], ["Rat Quest", 0, -130], ["Red Dead Online", 0, -131], ["Red Orchestra 2: Heroes of Stalingrad - Single Player", 0, -132], ["Resident Evil 4 (2005)", 254700, -133], ["Resident Evil 5", 21690, -134], ["Resident Evil 7 Biohazard", 418370, -135], ["Ricochet", 60, -136], ["Rise of the Tomb Raider", 391220, -137], ["Risen 2 - Dark Waters", 0, -138], ["Romance of the Three Kingdoms VIII with Power Up Kit", 0, -139], ["Romance of the Three Kingdoms X with Power Up Kit", 0, -140], ["Romance of the Three Kingdoms XI with Power Up Kit", 0, -141], ["Romance of the Three Kingdoms XII with Power Up Kit", 0, -142], ["Romance of the Three Kingdoms XIII", 0, -143], ["Sniper Elite 4", 312660, -144], ["Soccer Online: Ball 3D", 0, -145], ["Spin Rush", 0, -146], ["Slay the Spire", 646570, -147], ["STAR WARS Jedi: Fallen Order™", 1172380, -148], ["Starship Troopers: Terran Command", 0, -149], ["SteamWorld Dig 2", 0, -150], ["Stories: The Path of Destinies", 0, -151], ["Tabletop Simulator", 286160, -152], ["Team Fortress Classic", 20, -153], ["Temtem", 745920, -154], ["Terraria", 105600, -155], ["The Binding of Isaac", 113200, -156], ["The Descendant", 0, -157], ["The Elder Scrolls III: Morrowind", 22320, -158], ["The Elder Scrolls V: Skyrim", 72850, -159], ["The Elder Scrolls V: Skyrim Special Edition", 489830, -160], ["The LEGO® Movie 2 - Videogame", 0, -161], ["The Search", 0, -162], ["The Stanley Parable", 221910, -163], ["The Universim", 0, -164], ["The Wolf Among Us", 250320, -165], ["Three Kingdoms Zhao Yun", 0, -166], ["Titan Quest Anniversary Edition", 475150, -167], ["Titan Souls", 297130, -168], ["Titanfall® 2", 1237970, -169], ["Toki Tori", 38700, -170], ["Torchlight II", 200710, -171], ["Total War: ATTILA", 325610, -172], ["Total War: THREE KINGDOMS", 779340, -173], ["Toy Tinker Simulator", 0, -174], ["Tricking 0", 0, -175], ["Two Point Hospital", 535930, -176], ["Ultimate Zombie Defense", 0, -177], ["Valheim", 892970, -178], ["Vector Velocity", 0, -179], ["Warhammer 40,000: Inquisitor - Martyr", 527430, -180], ["Warhammer: Vermintide 2", 552500, -181], ["West of Loathing", 0, -182], ["WHAT THE PAK?!", 0, -183], ["Wild Terra 2: New Lands", 0, -184]
+        ];
+
+        // ===== DİĞER ÜRÜNLER =====
+        const allProducts = {
+            discord: [
+                { title: "DİSCORD İSTEDİĞİN MİKTAR BOOST", price: null, isBoost: true, tag: "Boost", icon: "fa-rocket", desc: "İstediğiniz miktarda Discord server boost. 8x'ten 32x'e kadar, sadece çift sayılar. Hızlı teslimat." }
+            ],
+            telegram: [
+                { title: "TELEGRAM 250.000 GÖRÜNTÜLENME HIZLI TESLİMAT", price: 50, tag: "Görüntülenme", icon: "fa-eye", desc: "250.000 Telegram görüntülenme, hızlı teslimat." },
+                { title: "50.000 TELEGRAM REAKSİYON EMOJİ", price: 75, tag: "Reaksiyon", icon: "fa-smile", desc: "50.000 Telegram reaksiyon emoji." },
+                { title: "30.000 TELEGRAM REAKSİYON EMOJİ", price: 50, tag: "Reaksiyon", icon: "fa-smile", desc: "30.000 Telegram reaksiyon emoji." },
+                { title: "10.000 TELEGRAM REAKSİYON EMOJİ", price: 30, tag: "Reaksiyon", icon: "fa-smile", desc: "10.000 Telegram reaksiyon emoji." },
+                { title: "TELEGRAM GARANTİLİ 2500 ÜYE", price: 30, tag: "Üye", icon: "fa-users", desc: "2500 Telegram garantili üye." },
+                { title: "TELEGRAM GARANTİLİ 5.000 ÜYE", price: 50, tag: "Üye", icon: "fa-users", desc: "5.000 Telegram garantili üye." }
+            ],
+            instagram: [
+                { title: "İNSTAGRAM 70.000 İZLENME", price: 35, tag: "İzlenme", icon: "fa-eye", desc: "70.000 Instagram izlenme." },
+                { title: "İNSTAGRAM 100.000 İZLENME", price: 65, tag: "İzlenme", icon: "fa-eye", desc: "100.000 Instagram izlenme." },
+                { title: "INSTAGRAM 10.000 BEĞENİ | GARANTİLİ", price: 70, tag: "Beğeni", icon: "fa-heart", desc: "10.000 Instagram beğeni, garantili." },
+                { title: "İNSTAGRAM 5000 BEĞENİ", price: 40, tag: "Beğeni", icon: "fa-heart", desc: "5000 Instagram beğeni." },
+                { title: "İNSTAGRAM GARANTİLİ 250 TAKİPÇİ", price: 55, tag: "Takipçi", icon: "fa-user-plus", desc: "250 Instagram garantili takipçi." }
+            ],
+            spotify: [
+                { title: "SPOTİFY GARANTİLİ 8000+ TAKİPÇİ", price: 100, tag: "Takipçi", icon: "fa-user-plus", desc: "8000+ Spotify garantili takipçi." }
+            ],
+            twitter: [
+                { title: "TWİTTER 150000 İZLENME", price: 70, tag: "İzlenme", icon: "fa-eye", desc: "150.000 Twitter izlenme." }
+            ],
+            facebook: [
+                { title: "FACEBOOK EFSANE PAKET – 1000 TAKİPÇİ + 1000 LİKE", price: 40, tag: "Paket", icon: "fa-box", desc: "1000 takipçi + 1000 like, efsane paket." }
+            ],
+            windows: [
+                { title: "Windows 11 Pro Retail Key | Orijinal Lisans", price: 30, tag: "Lisans", icon: "fa-windows", desc: "Orijinal Windows 11 Pro Retail lisans anahtarı. Ömür boyu kullanım." }
+            ],
+            diger: [
+                { title: "İTEMSATIŞ MAĞAZA BAŞLANGIÇ PAKETİ", price: 70, tag: "Paket", icon: "fa-store", desc: "Itemsatış mağaza başlangıç paketi." },
+                { title: "TORENT GTA 5 EN KARLISI", price: 30, tag: "Oyun", icon: "fa-gamepad", desc: "Torrent GTA 5, en karlısı." },
+                { title: "⚡ STEAM $200 GARANTİLİ RANDOM KEY ⚡", price: 15, tag: "Key", icon: "fa-key", desc: "$200 değerinde garantili random Steam key." }
+            ]
+        };
+
+        // ===== DURUM =====
+        let currentCategory = 'steam';
+        let currentPage = 1;
+        const perPage = 24;
+        let totalPages = 1;
+        let currentData = {};
+        let isBoostPanelOpen = false;
+
+        // ===== YARDIMCI =====
+        function getSteamImageUrl(appId) {
+            if (!appId || appId === 0) {
+                return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"%3E%3Crect width="300" height="400" fill="%230f1418"/%3E%3Ctext x="50%25" y="50%25" font-family="sans-serif" font-size="14" fill="%2300e5ff" text-anchor="middle"%3EGörsel Yok%3C/text%3E%3C/svg%3E';
+            }
+            return `https://steamcdn-a.akamaihd.net/steam/apps/${appId}/library_600x900.jpg`;
+        }
+
+        function getProductImage(product, category) {
+            const colors = {
+                steam: { main: '#00e5ff', dark: '#00b8d4', bg1: '#0a1a24', bg2: '#05080a' },
+                discord: { main: '#5865F2', dark: '#4752C4', bg1: '#0f1423', bg2: '#05080a' },
+                telegram: { main: '#0088cc', dark: '#006699', bg1: '#0a1520', bg2: '#05080a' },
+                instagram: { main: '#E1306C', dark: '#C13584', bg1: '#1a0a14', bg2: '#05080a' },
+                spotify: { main: '#1DB954', dark: '#1AA34A', bg1: '#0a1a10', bg2: '#05080a' },
+                twitter: { main: '#1DA1F2', dark: '#0d8bd9', bg1: '#0a1520', bg2: '#05080a' },
+                facebook: { main: '#1877F2', dark: '#0d5fcc', bg1: '#0a0f1a', bg2: '#05080a' },
+                windows: { main: '#0078D4', dark: '#005A9E', bg1: '#0a1020', bg2: '#05080a' },
+                diger: { main: '#FF9800', dark: '#F57C00', bg1: '#1a1205', bg2: '#05080a' }
+            };
+            const c = colors[category] || colors.steam;
+            
+            // Font Awesome ikon isimlerini SVG path'e çevir
+            const iconMap = {
+                'fa-rocket': 'M12 2L4 7v10l8 5 8-5V7z',
+                'fa-users': 'M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M8.5 7a4 4 0 100 8 4 4 0 000-8zM20 8v6M23 11h-6',
+                'fa-key': 'M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4',
+                'fa-gamepad': 'M6 12h4m-2-2v4m7-1h.01M18 10h.01M5 8h14a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4a2 2 0 012-2z',
+                'fa-eye': 'M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 15a3 3 0 100-6 3 3 0 000 6z',
+                'fa-heart': 'M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z',
+                'fa-user-plus': 'M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M8.5 7a4 4 0 100 8 4 4 0 000-8zM20 8v6M23 11h-6',
+                'fa-box': 'M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12',
+                'fa-smile': 'M12 22a10 10 0 100-20 10 10 0 000 20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01',
+                'fa-windows': 'M3 5.5L10 4v7H3zM10 20l-7-1.5V13h7zM21 4l-9 1.5v5.5h9zM12 12v6.5L21 20V12z',
+                'fa-store': 'M3 9l1.5-6h15L21 9M3 9v11a2 2 0 002 2h14a2 2 0 002-2V9M3 9h18M9 22V12h6v10'
+            };
+            
+            const iconPath = iconMap[product.icon] || iconMap['fa-box'];
+            const shortTag = product.tag.length > 10 ? product.tag.substring(0, 8) + '..' : product.tag;
+            
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400">
+                <defs>
+                    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:${c.bg1};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:${c.bg2};stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="glow" cx="50%" cy="40%" r="50%">
+                        <stop offset="0%" style="stop-color:${c.main};stop-opacity:0.25" />
+                        <stop offset="100%" style="stop-color:${c.main};stop-opacity:0" />
+                    </radialGradient>
+                </defs>
+                <rect width="300" height="400" fill="url(#g)"/>
+                <circle cx="150" cy="180" r="130" fill="url(#glow)"/>
+                <circle cx="150" cy="180" r="75" fill="${c.main}" opacity="0.1"/>
+                <circle cx="150" cy="180" r="55" fill="${c.main}" opacity="0.18"/>
+                <g transform="translate(110, 140) scale(3.3)" stroke="${c.main}" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="${iconPath}"/>
+                </g>
+                <text x="150" y="320" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="${c.main}" text-anchor="middle" opacity="0.9">${category.toUpperCase()}</text>
+                <text x="150" y="350" font-family="Arial, sans-serif" font-size="14" fill="#ffffff" text-anchor="middle" opacity="0.55">${shortTag}</text>
+            </svg>`;
+            return 'data:image/svg+xml,' + encodeURIComponent(svg);
+        }
+
+        // ===== VERİ HAZIRLAMA =====
+        function prepareData() {
+            if (currentCategory === 'steam') {
+                steamGames.sort((a, b) => b[2] - a[2]);
+                const seen = new Set();
+                const unique = steamGames.filter(g => {
+                    if (seen.has(g[0])) return false;
+                    seen.add(g[0]);
+                    return true;
+                });
+                totalPages = Math.ceil(unique.length / perPage);
+                currentData = {};
+                for (let i = 0; i < totalPages; i++) {
+                    currentData[i + 1] = unique.slice(i * perPage, (i + 1) * perPage);
+                }
+            } else {
+                const products = allProducts[currentCategory] || [];
+                totalPages = Math.ceil(products.length / perPage);
+                currentData = {};
+                for (let i = 0; i < totalPages; i++) {
+                    currentData[i + 1] = products.slice(i * perPage, (i + 1) * perPage);
+                }
+            }
+        }
+
+        // ===== KATEGORİ DEĞİŞTİR =====
+        function switchCategory(cat) {
+            currentCategory = cat;
+            currentPage = 1;
+            isBoostPanelOpen = false;
+
+            document.querySelectorAll('.category-menu button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === cat);
+            });
+
+            const titles = {
+                steam: 'STEAM <span>— OYUNLAR</span>',
+                discord: 'DISCORD <span>— BOOST</span>',
+                telegram: 'TELEGRAM <span>— ÜYE & GÖRÜNTÜLENME</span>',
+                instagram: 'INSTAGRAM <span>— TAKİPÇİ & BEĞENİ</span>',
+                spotify: 'SPOTIFY <span>— TAKİPÇİ</span>',
+                twitter: 'TWITTER <span>— İZLENME</span>',
+                facebook: 'FACEBOOK <span>— PAKETLER</span>',
+                windows: 'WINDOWS <span>— LİSANSLAR</span>',
+                diger: 'DİĞER <span>— ÜRÜNLER</span>'
+            };
+
+            document.getElementById('pageTitle').innerHTML = titles[cat] || 'ÜRÜNLER';
+
+            // Panel durumlarını sıfırla
+            document.getElementById('gamesGrid').style.display = 'grid';
+            document.getElementById('boostContainer').style.display = 'none';
+            document.getElementById('detailPanel').style.display = 'block';
+            document.getElementById('pagination').style.display = 'flex';
+
+            prepareData();
+            buildPagination();
+            renderProducts(1);
+            resetDetailPanel();
+        }
+
+        // ===== SAYFALAMA =====
+        function buildPagination() {
+            const pag = document.getElementById('pagination');
+            pag.innerHTML = '';
+            if (totalPages <= 1) return;
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.dataset.page = i;
+                if (i === currentPage) btn.classList.add('active');
+                btn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderProducts(i);
+                    updatePagination();
+                    resetDetailPanel();
+                });
+                pag.appendChild(btn);
+            }
+        }
+
+        function updatePagination() {
+            document.querySelectorAll('#pagination button').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.page) === currentPage);
+            });
+        }
+
+        // ===== ÜRÜN RENDER =====
+        function renderProducts(page) {
+            const grid = document.getElementById('gamesGrid');
+            const items = currentData[page] || [];
+
+            if (!items.length) {
+                grid.innerHTML = '<div style="padding:40px;color:#00e5ff;text-align:center;">Bu kategoride ürün yok.</div>';
+                return;
+            }
+
+            const catColors = {
+                steam: { main: '#00e5ff', dark: '#00b8d4' },
+                discord: { main: '#5865F2', dark: '#4752C4' },
+                telegram: { main: '#0088cc', dark: '#006699' },
+                instagram: { main: '#E1306C', dark: '#C13584' },
+                spotify: { main: '#1DB954', dark: '#1AA34A' },
+                twitter: { main: '#1DA1F2', dark: '#0d8bd9' },
+                facebook: { main: '#1877F2', dark: '#0d5fcc' },
+                windows: { main: '#0078D4', dark: '#005A9E' },
+                diger: { main: '#FF9800', dark: '#F57C00' }
+            };
+            const c = catColors[currentCategory] || catColors.steam;
+
+            let html = '';
+
+            if (currentCategory === 'steam') {
+                items.forEach((game) => {
+                    const title = game[0];
+                    const appId = game[1];
+                    const imgUrl = getSteamImageUrl(appId);
+
+                    html += `
+                        <div class="game-card" data-title="${title.replace(/"/g, '&quot;')}" data-img="${imgUrl}" data-type="steam">
+                            <div class="card-img-wrap">
+                                <img src="${imgUrl}" alt="${title}" loading="lazy" width="300" height="400">
+                                <span class="tag" style="background:linear-gradient(135deg,${c.main},${c.dark});">Steam</span>
+                            </div>
+                            <div class="card-info">
+                                <div class="category" style="color:${c.main};">STEAM</div>
+                                <h3>${title}</h3>
+                                <div class="card-actions">
+                                    <a href="https://www.itemsatis.com/p/bwranshop" target="_blank" class="btn-buy" style="background:linear-gradient(135deg,${c.main},${c.dark});color:#05080a;" onclick="event.stopPropagation()">
+                                        SATIN AL
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                items.forEach((product) => {
+                    const imgUrl = getProductImage(product, currentCategory);
+                    const isBoost = product.isBoost;
+                    const realIdx = allProducts[currentCategory].indexOf(product);
+
+                    html += `
+                        <div class="game-card" data-index="${realIdx}" data-is-boost="${isBoost ? 'true' : 'false'}">
+                            <div class="card-img-wrap">
+                                <img src="${imgUrl}" alt="${product.title}" loading="lazy" width="300" height="400">
+                                <span class="tag" style="background:linear-gradient(135deg,${c.main},${c.dark});">${product.tag}</span>
+                            </div>
+                            <div class="card-info">
+                                <div class="category" style="color:${c.main};">${currentCategory.toUpperCase()}</div>
+                                <h3>${product.title}</h3>
+                                ${isBoost 
+                                    ? `<div class="listing-price" style="color:${c.main};">DEĞİŞKEN <span>FİYAT</span></div>`
+                                    : `<div class="listing-price" style="color:${c.main};">${product.price} <span>TL</span></div>`
+                                }
+                                <div class="card-actions">
+                                    <a href="https://www.itemsatis.com/p/bwranshop" target="_blank" class="btn-buy" style="background:linear-gradient(135deg,${c.main},${c.dark});color:#05080a;" onclick="event.stopPropagation()">
+                                        SATIN AL
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            grid.innerHTML = html;
+
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const isBoost = card.dataset.isBoost === 'true';
+                    if (isBoost) {
+                        openBoostPanel();
+                        return;
+                    }
+                    if (currentCategory === 'steam') {
+                        showSteamDetail(card.dataset.title, card.dataset.img);
+                    } else {
+                        const idx = parseInt(card.dataset.index);
+                        const products = allProducts[currentCategory] || [];
+                        const product = products[idx];
+                        if (product) showProductDetail(product, currentCategory);
+                    }
+                });
+            });
+        }
+
+        // ===== BOOST PANELİ AÇ/KAPAT =====
+        function openBoostPanel() {
+            isBoostPanelOpen = true;
+            document.getElementById('gamesGrid').style.display = 'none';
+            document.getElementById('boostContainer').style.display = 'flex';
+            document.getElementById('detailPanel').style.display = 'none';
+            document.getElementById('pagination').style.display = 'none';
+        }
+
+        function closeBoostPanel() {
+            isBoostPanelOpen = false;
+            document.getElementById('gamesGrid').style.display = 'grid';
+            document.getElementById('boostContainer').style.display = 'none';
+            document.getElementById('detailPanel').style.display = 'block';
+            document.getElementById('pagination').style.display = 'flex';
+            resetDetailPanel();
+        }
+
+        // ===== STEAM DETAY =====
+        function showSteamDetail(title, imgUrl) {
+            document.getElementById('placeholder').style.display = 'none';
+            const content = document.getElementById('detailContent');
+            content.classList.add('active');
+
+            document.getElementById('detailImg').src = imgUrl;
+            document.getElementById('detailTitle').textContent = title;
+            document.getElementById('detailPrice').style.display = 'none';
+            document.getElementById('detailDesc').style.display = 'none';
+
+            document.getElementById('detailMeta').innerHTML = `
+                <span style="background:rgba(0,229,255,0.15);border-color:#00e5ff;color:#00e5ff;font-weight:800;">⚡ ANINDA GUARD KOD</span>
+                <span>GLOBAL</span>
+                <span>TÜRKÇE DESTEK</span>
+                <span>7/24 DESTEK</span>
+            `;
+
+            const buyBtn = document.getElementById('detailBuyBtn');
+            buyBtn.style.background = 'linear-gradient(135deg, #00e5ff, #00b8d4)';
+            buyBtn.style.color = '#05080a';
+        }
+
+        // ===== ÜRÜN DETAY =====
+        function showProductDetail(product, category) {
+            const catColors = {
+                steam: { main: '#00e5ff', dark: '#00b8d4' },
+                discord: { main: '#5865F2', dark: '#4752C4' },
+                telegram: { main: '#0088cc', dark: '#006699' },
+                instagram: { main: '#E1306C', dark: '#C13584' },
+                spotify: { main: '#1DB954', dark: '#1AA34A' },
+                twitter: { main: '#1DA1F2', dark: '#0d8bd9' },
+                facebook: { main: '#1877F2', dark: '#0d5fcc' },
+                windows: { main: '#0078D4', dark: '#005A9E' },
+                diger: { main: '#FF9800', dark: '#F57C00' }
+            };
+            const c = catColors[category] || catColors.steam;
+
+            document.getElementById('placeholder').style.display = 'none';
+            const content = document.getElementById('detailContent');
+            content.classList.add('active');
+
+            document.getElementById('detailImg').src = getProductImage(product, category);
+            document.getElementById('detailTitle').textContent = product.title;
+
+            const priceEl = document.getElementById('detailPrice');
+            priceEl.innerHTML = `${product.price} <span>TL</span>`;
+            priceEl.style.color = c.main;
+            priceEl.style.textShadow = `0 0 25px ${c.main}80`;
+            priceEl.style.display = 'block';
+
+            const descEl = document.getElementById('detailDesc');
+            descEl.textContent = product.desc;
+            descEl.style.display = 'block';
+
+            document.getElementById('detailMeta').innerHTML = `
+                <span style="background:${c.main}15;border-color:${c.main}60;color:${c.main};font-weight:800;">⚡ ANINDA TESLİMAT</span>
+                <span>GLOBAL</span>
+                <span>TÜRKÇE DESTEK</span>
+                <span>7/24 DESTEK</span>
+            `;
+
+            const buyBtn = document.getElementById('detailBuyBtn');
+            buyBtn.style.background = `linear-gradient(135deg, ${c.main}, ${c.dark})`;
+            buyBtn.style.color = '#05080a';
+            buyBtn.style.boxShadow = `0 0 25px ${c.main}60`;
+        }
+
+        function resetDetailPanel() {
+            document.getElementById('placeholder').style.display = 'flex';
+            document.getElementById('detailContent').classList.remove('active');
+            document.getElementById('detailImg').src = '';
+            document.getElementById('detailTitle').textContent = '';
+            document.getElementById('detailMeta').innerHTML = '';
+            document.getElementById('detailPrice').style.display = 'none';
+            document.getElementById('detailDesc').style.display = 'none';
+        }
+
+        // ===== BOOST MANTIĞI =====
+        function calculatePrice(boost) {
+            return 90 + ((boost - 8) / 2) * 20;
+        }
+
+        function updateBoost(value) {
+            const boost = parseInt(value);
+            const price = calculatePrice(boost);
+
+            document.getElementById('boostValue').textContent = boost;
+            document.getElementById('totalPrice').textContent = price;
+
+            const percent = ((boost - 8) / (32 - 8)) * 100;
+            document.getElementById('sliderFill').style.width = percent + '%';
+
+            let levelText = '';
+            if (boost < 14) levelText = 'Seviye 1 - Tüm özellikler aktif! 🎉';
+            else if (boost < 30) levelText = 'Seviye 2 - Daha fazla özellik! 🚀';
+            else levelText = 'Seviye 3 - Tüm özellikler aktif! 🌟';
+            document.getElementById('levelText').textContent = levelText;
+
+            document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
+            const quickBtn = document.querySelector(`.quick-btn[onclick="setBoost(${boost})"]`);
+            if (quickBtn) quickBtn.classList.add('active');
+        }
+
+        function setBoost(value) {
+            document.getElementById('boostRange').value = value;
+            updateBoost(value);
+        }
+
+        // ===== BAŞLAT =====
+        prepareData();
+        buildPagination();
+        renderProducts(1);
+
+        // ===== ARAMA =====
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) {
+                renderProducts(currentPage);
+                return;
+            }
+
+            const grid = document.getElementById('gamesGrid');
+            let results = [];
+
+            if (currentCategory === 'steam') {
+                results = steamGames.filter(g => g[0].toLowerCase().includes(query));
+            } else {
+                results = (allProducts[currentCategory] || []).filter(p => p.title.toLowerCase().includes(query));
+            }
+
+            if (!results.length) {
+                grid.innerHTML = '<div style="padding:40px;color:#00e5ff;text-align:center;">Sonuç bulunamadı.</div>';
+                return;
+            }
+
+            const catColors = {
+                steam: { main: '#00e5ff', dark: '#00b8d4' },
+                discord: { main: '#5865F2', dark: '#4752C4' },
+                telegram: { main: '#0088cc', dark: '#006699' },
+                instagram: { main: '#E1306C', dark: '#C13584' },
+                spotify: { main: '#1DB954', dark: '#1AA34A' },
+                twitter: { main: '#1DA1F2', dark: '#0d8bd9' },
+                facebook: { main: '#1877F2', dark: '#0d5fcc' },
+                windows: { main: '#0078D4', dark: '#005A9E' },
+                diger: { main: '#FF9800', dark: '#F57C00' }
+            };
+            const c = catColors[currentCategory] || catColors.steam;
+
+            let html = '';
+
+            if (currentCategory === 'steam') {
+                results.slice(0, 48).forEach((game) => {
+                    const title = game[0];
+                    const imgUrl = getSteamImageUrl(game[1]);
+                    html += `
+                        <div class="game-card" data-title="${title.replace(/"/g, '&quot;')}" data-img="${imgUrl}" data-type="steam">
+                            <div class="card-img-wrap">
+                                <img src="${imgUrl}" alt="${title}" loading="lazy" width="300" height="400">
+                                <span class="tag" style="background:linear-gradient(135deg,${c.main},${c.dark});">Steam</span>
+                            </div>
+                            <div class="card-info">
+                                <div class="category" style="color:${c.main};">STEAM</div>
+                                <h3>${title}</h3>
+                                <div class="card-actions">
+                                    <a href="https://www.itemsatis.com/p/bwranshop" target="_blank" class="btn-buy" style="background:linear-gradient(135deg,${c.main},${c.dark});color:#05080a;" onclick="event.stopPropagation()">
+                                        SATIN AL
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                results.slice(0, 48).forEach((product) => {
+                    const imgUrl = getProductImage(product, currentCategory);
+                    const isBoost = product.isBoost;
+                    const realIdx = allProducts[currentCategory].indexOf(product);
+                    html += `
+                        <div class="game-card" data-index="${realIdx}" data-is-boost="${isBoost ? 'true' : 'false'}">
+                            <div class="card-img-wrap">
+                                <img src="${imgUrl}" alt="${product.title}" loading="lazy" width="300" height="400">
+                                <span class="tag" style="background:linear-gradient(135deg,${c.main},${c.dark});">${product.tag}</span>
+                            </div>
+                            <div class="card-info">
+                                <div class="category" style="color:${c.main};">${currentCategory.toUpperCase()}</div>
+                                <h3>${product.title}</h3>
+                                ${isBoost 
+                                    ? `<div class="listing-price" style="color:${c.main};">DEĞİŞKEN <span>FİYAT</span></div>`
+                                    : `<div class="listing-price" style="color:${c.main};">${product.price} <span>TL</span></div>`
+                                }
+                                <div class="card-actions">
+                                    <a href="https://www.itemsatis.com/p/bwranshop" target="_blank" class="btn-buy" style="background:linear-gradient(135deg,${c.main},${c.dark});color:#05080a;" onclick="event.stopPropagation()">
+                                        SATIN AL
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            grid.innerHTML = html;
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const isBoost = card.dataset.isBoost === 'true';
+                    if (isBoost) { openBoostPanel(); return; }
+                    if (currentCategory === 'steam') {
+                        showSteamDetail(card.dataset.title, card.dataset.img);
+                    } else {
+                        const idx = parseInt(card.dataset.index);
+                        const products = allProducts[currentCategory] || [];
+                        const product = products[idx];
+                        if (product) showProductDetail(product, currentCategory);
+                    }
+                });
+            });
+        });
+
+        document.addEventListener('error', (e) => {
+            if (e.target.tagName === 'IMG') {
+                e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"%3E%3Crect width="300" height="400" fill="%230f1418"/%3E%3Ctext x="50%25" y="50%25" font-family="sans-serif" font-size="14" fill="%2300e5ff" text-anchor="middle"%3EGörsel Yüklenemedi%3C/text%3E%3C/svg%3E';
+            }
+        }, true);
+    </script>
+
+</body>
+</html>
